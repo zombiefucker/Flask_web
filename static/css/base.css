@@ -1,0 +1,25 @@
+.logo {
+    width: 40px;
+}
+
+body{
+    background: url(/static/images/bkgd.png) no-repeat center;
+}
+
+.main{
+    background: #fffafa;
+    width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 10px;
+    opacity: 0.95;
+}
+
+.form-container{
+    width: 300px;
+    margin: 0px auto;
+}
+
+.text-center{
+    text-align: center;
+}
