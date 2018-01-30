@@ -3,6 +3,7 @@
 from flask import Flask,url_for,render_template,request,redirect,session
 from exts import db
 from models import Users,Articles
+from decorators import login_limit
 import config
 
 app = Flask(__name__)
@@ -52,6 +53,7 @@ def Regist():
             return redirect(url_for('Login'))
 
 @app.route('/release',methods=['GET','POST'])
+@login_limit
 def Release():
     if request.method == 'GET':
         return render_template('Release.html')
