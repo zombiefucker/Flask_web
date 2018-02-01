@@ -1,6 +1,6 @@
 #encoding:utf-8
 
-from flask import Flask,url_for,render_template,request,redirect,session
+from flask import Flask,url_for,render_template,request,redirect,session,g
 from exts import db
 from models import Users,Articles
 from decorators import login_limit
@@ -9,10 +9,6 @@ import config
 app = Flask(__name__)
 app.config.from_object(config)
 db.init_app(app)
-
-
-
-#db.create_all()
 
 @app.route('/')
 def Index():
@@ -25,13 +21,18 @@ def Login():
     else:
         username = request.form.get('username')
         password = request.form.get('password')
-        user = Users.query.filter(Users.username == username,Users.password == password).first()
-        if user:
+        user = Users.query.filter(Users.username == username).first()
+        if user and user.check_password(password):
             session['user_id'] = user.id
+            session.permanent = True
             return redirect(url_for('Index'))
-            #session.permenent
         else:
             return '用户名或者密码错误'
+
+@app.route('/logout')
+def Logout():
+    session.clear()
+    return redirect(url_for('Login'))
 
 @app.route('/regist',methods=['GET','POST'])
 def Regist():
@@ -62,17 +63,25 @@ def Release():
         content = request.form.get('content')
         article = Articles(title=title,content=content)
 
-        user_id = session.get('user_id')
-        user = Users.query.filter(Users.id == user_id).first()
-        article.author = user
-
+        article.author = g.user
         db.session.add(article)
         db.session.commit()
         return redirect(url_for('Index'))
         pass
 
+@app.before_request
+def before_request():
+    user_id = session.get('user_id')
+    if user_id:
+        user = Users.query.filter(Users.id == user_id).first()
+        if user:
+            g.user = user
 
-
+@app.context_processor
+def context_processor():
+    if hasattr(g,'user'):
+        return {'user':g.user}
+    return {}
 
 if __name__ == '__main__':
     app.run(debug=True)
