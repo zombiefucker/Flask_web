@@ -57,7 +57,7 @@ def Regist():
 @login_limit
 def Release():
     if request.method == 'GET':
-        return render_template('Release.html')
+        return render_template('release.html')
     else:
         title = request.form.get('title')
         content = request.form.get('content')
